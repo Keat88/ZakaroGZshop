@@ -1,12 +1,19 @@
 ﻿import { useState } from "react";
-import { Mail, MapPin, Phone, Clock } from "lucide-react";
+import { Clock, Mail, MapPin, Phone } from "lucide-react";
 import { Container, Section, SectionHeading } from "../components/ui/Section";
-import Input from "../components/ui/Input";
+import Input, { Textarea } from "../components/ui/Input";
 import Button from "../components/ui/Button";
-import { Reveal } from "../components/ui/Reveal";
+import Reveal from "../components/ui/Reveal";
 import { usePageTitle } from "../components/ui/ScrollToTop";
 
 const initial = { name: "", email: "", phone: "", subject: "", message: "" };
+
+const details = [
+  { Icon: MapPin, label: "Visit", value: "51P, Sen Sok, Phnom Penh, Cambodia" },
+  { Icon: Mail, label: "Email", value: "support@zharpro.com", href: "mailto:support@zharpro.com" },
+  { Icon: Phone, label: "Phone", value: "+855 96 575 7413", href: "tel:+855965757413" },
+  { Icon: Clock, label: "Hours", value: "Monday – Saturday, 9:00 AM – 6:00 PM" },
+];
 
 export default function Contact() {
   usePageTitle("Contact");
@@ -38,51 +45,58 @@ export default function Contact() {
       setStatus({ type: "error", msg: "Please correct the highlighted fields." });
       return;
     }
-    setStatus({ type: "success", msg: "Message received. This demo stores no backend submission; connect a form endpoint to deliver messages." });
+    setStatus({ type: "success", msg: "Form validated locally. This demo has no submission backend; connect one to deliver messages." });
     setForm(initial);
   };
 
   return (
-    <main>
-      <Section className="border-b border-border bg-surface-alt/30 py-14 md:py-20">
+    <main id="main">
+      <Section className="border-b border-border bg-surface-alt/40 py-14 md:py-20">
         <Container>
-          <SectionHeading eyebrow="Contact" title="We’re here to help." description="Questions about products, orders, or partnerships—our team is ready with thoughtful support." />
+          <SectionHeading as="h1" eyebrow="Contact" title="We’re here to help." description="Questions about products, orders, or partnerships — our team is ready with thoughtful support." />
         </Container>
       </Section>
 
-      <Section>
-        <Container className="grid gap-10 lg:grid-cols-[1fr_1.2fr]">
-          <Reveal className="space-y-6">
-            <div className="rounded-3xl border border-border bg-surface p-7">
-              <h2 className="text-xl font-semibold">Contact information</h2>
-              <div className="mt-6 space-y-5 text-sm text-muted">
-                <p className="flex gap-3"><MapPin size={18} className="mt-0.5 shrink-0 text-foreground" /><span>51P, Sen Sok, Phnom Penh, Cambodia</span></p>
-                <p className="flex gap-3"><Mail size={18} className="mt-0.5 shrink-0 text-foreground" /><a href="mailto:support@zharpro.com" className="hover:text-foreground">support@zharpro.com</a></p>
-                <p className="flex gap-3"><Phone size={18} className="mt-0.5 shrink-0 text-foreground" /><a href="tel:+855965757413" className="hover:text-foreground">+855 96 575 7413</a></p>
-                <p className="flex gap-3"><Clock size={18} className="mt-0.5 shrink-0 text-foreground" /><span>Monday – Saturday, 9:00 AM – 6:00 PM</span></p>
+      <Section className="py-14 md:py-20">
+        <Container className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
+          <Reveal className="space-y-5">
+            <div className="border border-border bg-surface p-7 sm:p-8">
+              <h2 className="text-[10px] font-semibold uppercase tracking-[0.24em] text-muted">Contact information</h2>
+              <div className="mt-8 space-y-6">
+                {details.map(({ Icon, label, value, href }) => (
+                  <div key={label} className="flex gap-4 border-b border-border pb-5 last:border-0 last:pb-0">
+                    <Icon size={18} className="mt-0.5 shrink-0 text-foreground" strokeWidth={1.6} />
+                    <div>
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted">{label}</p>
+                      {href ? <a href={href} className="mt-1 inline-block text-sm text-foreground transition-colors hover:text-muted">{value}</a> : <p className="mt-1 text-sm text-foreground">{value}</p>}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-            <div className="rounded-3xl border border-border bg-surface-alt/40 p-7">
+            <div className="border border-border bg-surface-alt/60 p-7">
               <p className="text-sm leading-7 text-muted">For order support, include your order reference in the message so we can assist you quickly.</p>
             </div>
           </Reveal>
 
           <Reveal delay={100}>
-            <form onSubmit={submit} noValidate className="rounded-3xl border border-border bg-surface p-7 sm:p-8">
-              <div className="grid gap-5 sm:grid-cols-2">
-                <Input label="Full name" id="name" name="name" value={form.name} onChange={onChange} autoComplete="name" error={errors.name} />
-                <Input label="Email address" id="email" name="email" type="email" value={form.email} onChange={onChange} autoComplete="email" error={errors.email} />
-                <Input label="Phone number" id="phone" name="phone" type="tel" value={form.phone} onChange={onChange} autoComplete="tel" error={errors.phone} />
-                <Input label="Subject" id="subject" name="subject" value={form.subject} onChange={onChange} error={errors.subject} />
+            <form onSubmit={submit} noValidate className="border border-border bg-surface p-6 sm:p-9">
+              <div>
+                <h2 className="text-xl font-semibold tracking-tight">Send a message</h2>
+                <p className="mt-2 text-sm text-muted">Fields marked with an asterisk are required.</p>
               </div>
-              <label className="mt-5 block space-y-2">
-                <span className="text-sm font-medium text-foreground">Message</span>
-                <textarea id="message" name="message" rows={6} value={form.message} onChange={onChange} className={`w-full rounded-xl border bg-surface px-4 py-3 text-sm text-foreground placeholder:text-muted focus:outline-none focus:ring-2 focus:ring-foreground/15 ${errors.message ? "border-danger focus:ring-danger/20" : "border-border"}`} placeholder="How can we help?" />
-                {errors.message ? <span className="text-xs text-danger">{errors.message}</span> : null}
-              </label>
-              <div className="mt-6 flex flex-wrap items-center gap-4">
+              <div className="mt-8 grid gap-6 sm:grid-cols-2">
+                <Input label="Full name *" id="name" name="name" value={form.name} onChange={onChange} autoComplete="name" error={errors.name} />
+                <Input label="Email address *" id="email" name="email" type="email" value={form.email} onChange={onChange} autoComplete="email" error={errors.email} />
+                <Input label="Phone number *" id="phone" name="phone" type="tel" value={form.phone} onChange={onChange} autoComplete="tel" error={errors.phone} />
+                <Input label="Subject *" id="subject" name="subject" value={form.subject} onChange={onChange} error={errors.subject} />
+              </div>
+              <div className="mt-6">
+                <Textarea label="Message *" id="message" name="message" rows={6} value={form.message} onChange={onChange} error={errors.message} placeholder="How can we help?" />
+              </div>
+              <div className="mt-7 flex flex-wrap items-center gap-5">
                 <Button type="submit">Send message</Button>
-                <p className="text-sm" aria-live="polite">{status.msg ? <span className={status.type === "error" ? "text-danger" : "text-muted"}>{status.msg}</span> : null}</p>
+                <p className="flex-1 text-xs leading-6" role="status" aria-live="polite">{status.msg ? <span className={status.type === "error" ? "text-danger" : "text-muted"}>{status.msg}</span> : null}</p>
               </div>
             </form>
           </Reveal>

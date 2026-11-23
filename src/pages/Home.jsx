@@ -10,7 +10,7 @@ import { usePageTitle } from "../components/ui/ScrollToTop";
 export default function Home() {
   usePageTitle("Home");
   return (
-    <main>
+    <main id="main">
       <Hero />
       <FeaturedCategories />
       <FeaturedProducts />

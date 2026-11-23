@@ -28,8 +28,8 @@ const normalize = (item, index) => {
     brand: item?.brand || "ZharpRo",
     description: item?.description || "Premium technology crafted for modern living, balancing performance with timeless design.",
     status: item?.status || (item?.isNew ? "new" : ""),
-    rating: Number(item?.rating?.rate ?? item?.rating ?? (4.5 + (index % 5) * 0.1)),
-    reviews: Number(item?.rating?.count ?? item?.reviews ?? 24 + (index % 30)),
+    rating: Number(item?.rating?.rate ?? item?.rating ?? 0) || 0,
+    reviews: Number(item?.rating?.count ?? item?.reviews ?? 0) || 0,
   };
 };
 

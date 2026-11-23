@@ -1,37 +1,21 @@
-﻿import { useEffect, useRef, useState } from "react";
+﻿import { motion, useReducedMotion } from "motion/react";
 
-// eslint-disable-next-line react-refresh/only-export-components
-export function useReveal(options = {}) {
-  const ref = useRef(null);
-  const [visible, setVisible] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  });
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || visible) return;
-    const obs = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) { setVisible(true); obs.disconnect(); }
-    }, { threshold: 0.15, ...options });
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, [options, visible]);
-  return [ref, visible];
-}
+export function Reveal({ as = "div", className, children, delay = 0, y = 24, ...props }) {
+  const reduceMotion = useReducedMotion();
+  const MotionComponent = motion[as] || motion.div;
 
-export function Reveal({ as: Comp = "div", className = "", children, delay = 0 }) {
-  const [ref, visible] = useReveal();
   return (
-    <Comp
-      ref={ref}
+    <MotionComponent
       className={className}
-      style={{
-        opacity: visible ? 1 : 0,
-        transform: visible ? "none" : "translateY(24px)",
-        transition: `opacity 700ms cubic-bezier(.2,.8,.2,1) ${delay}ms, transform 700ms cubic-bezier(.2,.8,.2,1) ${delay}ms`,
-      }}
+      initial={reduceMotion ? false : { opacity: 0, y }}
+      whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.12, margin: "0px 0px -40px 0px" }}
+      transition={{ duration: reduceMotion ? 0 : 0.7, delay: reduceMotion ? 0 : delay / 1000, ease: [0.16, 1, 0.3, 1] }}
+      {...props}
     >
       {children}
-    </Comp>
+    </MotionComponent>
   );
 }
+
+export default Reveal;

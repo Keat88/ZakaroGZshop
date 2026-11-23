@@ -1,61 +1,62 @@
-﻿import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { MapPin } from "lucide-react";
+﻿import { Link } from "react-router-dom";
+import { ArrowUpRight, Mail, MapPin, Phone } from "lucide-react";
 import { FaFacebook, FaInstagram, FaXTwitter } from "react-icons/fa6";
+import { Container } from "./ui/Section";
 
 const links = {
-  Shop: [["Products", "/products"], ["Cart", "/cart"], ["New Arrivals", "/products?status=new"]],
-  Company: [["About", "/about"], ["Contact", "/contact"], ["Home", "/"]],
-  Support: [["Customer Care", "/contact"], ["Shipping & Returns", "/about"], ["FAQ", "/contact"]],
+  Shop: [["All products", "/products"], ["The collection", "/products#collection"], ["Your cart", "/cart"]],
+  Company: [["Home", "/"], ["About ZharpRo", "/about"], ["Contact", "/contact"]],
+  Explore: [["Mobile", "/products?category=Mobile"], ["Computing", "/products?category=Computing"], ["Audio", "/products?category=Audio"]],
 };
 
-export default function Footer() {
-  const [location, setLocation] = useState("");
-  useEffect(() => {
-    if (!navigator.geolocation) return;
-    navigator.geolocation.getCurrentPosition(async (pos) => {
-      try {
-        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`);
-        const data = await res.json();
-        setLocation(data?.address?.city || data?.address?.town || data?.address?.state || "");
-      } catch { /* ignore */ }
-    }, () => {}, { timeout: 5000 });
-  }, []);
+const socials = [
+  { label: "Instagram", href: "https://www.instagram.com", Icon: FaInstagram },
+  { label: "Facebook", href: "https://www.facebook.com", Icon: FaFacebook },
+  { label: "X", href: "https://x.com", Icon: FaXTwitter },
+];
 
+export default function Footer() {
   return (
-    <footer className="border-t border-border bg-surface-alt/40">
-      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="grid gap-12 lg:grid-cols-[1.3fr_2fr]">
+    <footer className="border-t border-border bg-surface-alt/50">
+      <Container className="py-16 md:py-20">
+        <div className="grid gap-12 lg:grid-cols-[1.2fr_2fr] lg:gap-20">
           <div>
-            <Link to="/" className="text-xl font-semibold tracking-[0.22em]">ZHARPRO</Link>
-            <p className="mt-5 max-w-sm text-sm leading-7 text-muted">A premium monochrome destination for modern electronics, crafted for clarity, confidence, and refined everyday living.</p>
-            {location ? <p className="mt-4 flex items-center gap-2 text-sm text-muted"><MapPin size={15} /> Delivering near {location}</p> : null}
-            <div className="mt-6 flex gap-3">
-              {[{Icon:FaInstagram,label:"Instagram",href:"https://www.instagram.com"},{Icon:FaFacebook,label:"Facebook",href:"https://www.facebook.com"},{Icon:FaXTwitter,label:"X",href:"https://x.com"}].map(({Icon,label,href}) => (
-                <a key={label} href={href} target="_blank" rel="noreferrer" aria-label={label} className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border text-muted transition hover:bg-accent hover:text-accent-foreground">
-                  <Icon size={17} />
-                </a>
-              ))}
+            <Link to="/" className="inline-flex items-center gap-3" aria-label="ZharpRo home">
+              <span className="inline-flex h-9 w-9 items-center justify-center border border-foreground text-sm font-semibold">Z</span>
+              <span className="text-base font-semibold tracking-[0.28em]">ZHARPRO</span>
+            </Link>
+            <p className="mt-6 max-w-sm text-sm leading-7 text-muted">A considered destination for premium electronics and EV gadgets. Precision-selected, honestly presented, built for modern living.</p>
+            <div className="mt-8 space-y-3 text-sm text-muted">
+              <p className="flex items-start gap-3"><MapPin size={16} className="mt-1 shrink-0 text-foreground" /><span>51P, Sen Sok, Phnom Penh, Cambodia</span></p>
+              <p className="flex items-center gap-3"><Mail size={16} className="shrink-0 text-foreground" /><a href="mailto:support@zharpro.com" className="transition-colors hover:text-foreground">support@zharpro.com</a></p>
+              <p className="flex items-center gap-3"><Phone size={16} className="shrink-0 text-foreground" /><a href="tel:+855965757413" className="transition-colors hover:text-foreground">+855 96 575 7413</a></p>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-8 sm:grid-cols-3">
+
+          <div className="grid gap-10 sm:grid-cols-3">
             {Object.entries(links).map(([title, items]) => (
-              <div key={title}>
-                <h3 className="text-xs font-semibold uppercase tracking-[0.2em] text-foreground">{title}</h3>
-                <ul className="mt-4 space-y-3">
-                  {items.map(([label, to]) => <li key={label}><Link to={to} className="text-sm text-muted transition hover:text-foreground">{label}</Link></li>)}
+              <nav key={title} aria-label={title}>
+                <h2 className="text-[10px] font-semibold uppercase tracking-[0.24em] text-foreground">{title}</h2>
+                <ul className="mt-5 space-y-3">
+                  {items.map(([label, to]) => <li key={label}><Link to={to} className="text-sm text-muted transition-colors hover:text-foreground">{label}</Link></li>)}
                 </ul>
-              </div>
+              </nav>
             ))}
           </div>
         </div>
-        <div className="mt-14 flex flex-col gap-4 border-t border-border pt-6 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} ZharpRo. All rights reserved.</p>
-          <p>Premium electronics, thoughtfully selected.</p>
+
+        <div className="mt-14 flex flex-col gap-6 border-t border-border pt-8 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xs text-muted">© {new Date().getFullYear()} ZharpRo. All rights reserved.</p>
+          <div className="flex items-center gap-3">
+            {socials.map(({ label, href, Icon }) => (
+              <a key={label} href={href} target="_blank" rel="noreferrer" aria-label={label} className="inline-flex h-10 w-10 items-center justify-center border border-border text-muted transition-colors hover:border-foreground hover:text-foreground">
+                <Icon size={16} />
+              </a>
+            ))}
+            <Link to="/products" className="ml-2 inline-flex h-10 w-10 items-center justify-center border border-foreground text-foreground transition-colors hover:bg-accent hover:text-accent-foreground" aria-label="Shop now"><ArrowUpRight size={17} /></Link>
+          </div>
         </div>
-      </div>
+      </Container>
     </footer>
   );
 }
-
-

@@ -1,46 +1,52 @@
-﻿import { Heart, ShoppingBag, Star } from "lucide-react";
+﻿import { useState } from "react";
 import { Link } from "react-router-dom";
+import { ArrowUpRight, ShoppingBag, Star } from "lucide-react";
+import { toast } from "react-toastify";
 import { useCart } from "../../contexts/CartContext";
 import { formatPrice } from "../../lib/utils";
 import Button from "../ui/Button";
 
 export default function ProductCard({ product }) {
   const { addItem } = useCart();
+  const [imageFailed, setImageFailed] = useState(false);
   const p = {
     id: product.id ?? product.product_id,
-    name: product.name || product.title,
+    name: product.name || product.title || "Untitled product",
     price: Number(product.price) || 0,
-    image: product.image || product.img,
+    image: product.image || product.img || product.thumbnail || "",
     brand: product.brand || product.category || "Collection",
+    category: product.category || "Collection",
     status: product.status,
-    rating: Number(product.rating || 4.8),
+    rating: Number(product.rating) || 0,
+    reviews: Number(product.reviews) || 0,
+  };
+
+  const addToCart = () => {
+    addItem(p);
+    toast.success(`${p.name} added to cart`);
   };
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-3xl border border-border bg-surface transition duration-300 hover:-translate-y-1 hover:shadow-[0_20px_60px_-30px_rgba(0,0,0,0.35)]">
-      <div className="relative overflow-hidden bg-surface-alt">
-        <Link to={`/products?highlight=${encodeURIComponent(p.id)}`} className="block aspect-[4/5]">
-          <img src={p.image} alt={p.name} loading="lazy" className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.04]" />
-        </Link>
-        <div className="absolute left-4 top-4 flex gap-2">
-          {p.status ? <span className="rounded-full bg-background/90 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-foreground backdrop-blur">{p.status}</span> : null}
+    <article className="group flex h-full flex-col border border-border bg-surface transition-all duration-500 ease-premium hover:-translate-y-1 hover:border-foreground/30 hover:shadow-lift">
+      <Link to={`/products?category=${encodeURIComponent(p.category)}`} className="relative block aspect-[4/5] overflow-hidden bg-surface-alt" aria-label={`Explore ${p.category} products`}>
+        {p.image && !imageFailed ? (
+          <img src={p.image} alt={p.name} loading="lazy" decoding="async" onError={() => setImageFailed(true)} className="h-full w-full object-cover transition-transform duration-700 ease-premium group-hover:scale-105" />
+        ) : (
+          <span className="flex h-full w-full items-center justify-center p-8 text-center text-[10px] font-semibold uppercase tracking-[0.24em] text-muted">{p.category}</span>
+        )}
+        {p.status ? <span className="absolute left-3 top-3 bg-background px-3 py-1.5 text-[9px] font-semibold uppercase tracking-[0.22em] text-foreground">{p.status}</span> : null}
+        <span className="absolute bottom-3 right-3 inline-flex h-9 w-9 items-center justify-center bg-background text-foreground opacity-0 transition-opacity duration-300 group-hover:opacity-100" aria-hidden="true"><ArrowUpRight size={16} /></span>
+      </Link>
+
+      <div className="flex flex-1 flex-col p-4 sm:p-6">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted">{p.brand}</p>
+        <h3 className="mt-3 text-base font-medium leading-snug tracking-tight text-foreground line-clamp-2">{p.name}</h3>
+        <div className="mt-3 flex min-h-5 items-center gap-2 text-xs text-muted">
+          {p.rating > 0 ? <><Star size={13} className="fill-foreground text-foreground" /><span>{p.rating.toFixed(1)}</span>{p.reviews > 0 ? <span className="text-muted">({p.reviews})</span> : null}</> : null}
         </div>
-        <button aria-label={`Save ${p.name}`} className="absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-background/90 text-foreground backdrop-blur transition hover:bg-accent hover:text-accent-foreground">
-          <Heart size={18} />
-        </button>
-      </div>
-      <div className="flex flex-1 flex-col p-5">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted">{p.brand}</p>
-        <h3 className="mt-2 text-lg font-medium leading-snug text-foreground line-clamp-2">{p.name}</h3>
-        <div className="mt-3 flex items-center gap-2 text-sm text-muted">
-          <Star size={14} className="fill-foreground text-foreground" />
-          <span>{p.rating.toFixed(1)}</span>
-        </div>
-        <div className="mt-auto flex items-center justify-between gap-3 pt-6">
-          <p className="text-lg font-semibold tracking-tight">{formatPrice(p.price)}</p>
-          <Button size="sm" onClick={() => addItem(p)} aria-label={`Add ${p.name} to cart`}>
-            <ShoppingBag size={16} /> Add
-          </Button>
+        <div className="mt-auto flex flex-col items-start gap-3 pt-6 sm:flex-row sm:items-end sm:justify-between">
+          <p className="text-lg font-semibold tracking-tight text-foreground">{formatPrice(p.price)}</p>
+          <Button size="sm" onClick={addToCart} aria-label={`Add ${p.name} to cart`}><ShoppingBag size={14} /> Add</Button>
         </div>
       </div>
     </article>
